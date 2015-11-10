@@ -1,9 +1,38 @@
-<script src="socket.io.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="socket.io.js"></script>
+  <title></title>
+</head>
+<body>
+<button type="button" onclick="auth()">login</button>
+<div id="login"></div>
+<input id="edit" type="text"/>
+<div id="msg"></div>
+<button type="button" onclick="send()">send</button>
 <script>
   var socket = io.connect('http://localhost');
-  socket.on('news', function (data) {
-    console.log(data);
-     document.write(data.hello);
-    socket.emit('my other event', { my: 'data' });
+  var login=document.getElementById('login');
+  var msg=document.getElementById('msg');
+  var edit=document.getElementById('edit');
+  socket.on('login', function (data) {
+    console.log('login:'+data);
+    //document.write(data.hello);
+    login.innerHTML=data.msg;
   });
+  socket.on('message', function (data) {
+    console.log('message:'+data);
+    //document.write(data.msg);
+    msg.innerHTML=data.msg;
+  });
+  var auth= function () {
+    socket.emit('auth', { name:'haer',password:'123'});
+  };
+  var send=function(){
+    socket.send({msg:edit.value});
+  };
 </script>
+</body>
+</html>
+

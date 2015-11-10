@@ -2,6 +2,7 @@
  * Created by guizhen on 2015/11/4.
  */
 var mongo = require('./db');
+var util = require('./util');
 mongo.connect();
 var userSchema=new mongo.Schema({
     name:String
@@ -10,6 +11,7 @@ var userSchema=new mongo.Schema({
 var User=mongo.mongoose.model('User',userSchema);
 module.exports =User;
 User.add=function(name,password,callback){
+    callback=util.wrapFn(callback);
     var newUser=new User();
     newUser.name=name;
     newUser.password=password;
@@ -24,8 +26,6 @@ User.add=function(name,password,callback){
 };
 User.findByName=function(name,callback){
     User.findOne({name:name},function(err,doc){
-        console.log('===err'+err);
-        console.log('===doc'+doc);
         if(err){
             console.log(err);
             callback(err,null);
@@ -34,17 +34,16 @@ User.findByName=function(name,callback){
         }
     });
 };
-User.verify=function(name,password){
+User.verify=function(name,password,callback){
     console.log('verify');
+    callback=util.wrapFn(callback);
     this.findByName(name,function(err,doc){
-        console.log('err'+err);
-        console.log('doc'+doc);
         if(err){
-            return false;
+            callback(false);
         }else if(doc){
-            return doc.password==password?true:false;
+            callback(doc.password==password?true:false);
         }else{
-            return false;
+            callback(false);
         }
     });
 };
